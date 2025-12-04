@@ -1,20 +1,30 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useHopeHub } from '../contexts/HopeHubContext';
-import { Upload, FileText } from 'lucide-react';
+import { Upload, FileText, Camera, GraduationCap, School, Book, AlertTriangle, X, Plus } from 'lucide-react';
 
 const SubmitRequestPage = () => {
   const { addRequest } = useHopeHub();
   const navigate = useNavigate();
 
+  const [userType, setUserType] = useState('student'); 
+
   const [formData, setFormData] = useState({
-    studentName: '', district: '', location: '', category: '', items: '', story: '', phone: '', verificationDoc: null
+    studentName: '', 
+    district: '', 
+    location: '', 
+    items: '', 
+    story: '', 
+    phone: '', 
+    verificationDoc: null,
+    disasterImages: [] 
   });
+
   const [verificationPreview, setVerificationPreview] = useState(null);
 
   const handleInputChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   
-  const handleFileUpload = (e) => {
+  const handleVerificationUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       setFormData(prev => ({ ...prev, verificationDoc: file.name }));
@@ -24,36 +34,98 @@ const SubmitRequestPage = () => {
     }
   };
 
-  const isFormValid = () => Object.values(formData).every(val => val);
+  // Handle Disaster Images (Multiple Files)
+  const handleDisasterUpload = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+      const newImageUrls = files.map(file => URL.createObjectURL(file));
+      setFormData(prev => ({
+        ...prev,
+        disasterImages: [...prev.disasterImages, ...newImageUrls]
+      }));
+    }
+  };
+
+  // Remove a specific image
+  const removeImage = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      disasterImages: prev.disasterImages.filter((_, i) => i !== index)
+    }));
+  };
+
+  const isFormValid = () => {
+    const basicFields = formData.studentName && formData.district && formData.location && formData.items && formData.story && formData.phone;
+    
+    if (userType === 'student') {
+        return basicFields && formData.disasterImages.length > 0;
+    } else {
+        return basicFields && formData.verificationDoc;
+    }
+  };
   
   const handleSubmit = () => {
     if (isFormValid()) {
-      addRequest({ ...formData, items: formData.items.split(',').map(item => item.trim()), verified: true });
+      addRequest({ 
+        ...formData, 
+        userType, 
+        items: formData.items.split(',').map(item => item.trim()), 
+        verified: true,
+        disasterImage: formData.disasterImages.length > 0 ? formData.disasterImages[0] : null
+      });
       alert('Your request has been submitted successfully!');
       navigate('/hub-view');
     }
   };
 
   const districts = ['Gampaha', 'Kalutara', 'Matara', 'Colombo', 'Galle', 'Kandy', 'Kurunegala'];
-  const categories = ['Textbooks', 'Uniforms', 'Stationery', 'Shoes', 'Bags', 'Other'];
+
+  const getNameLabel = () => {
+    if (userType === 'school') return 'School Name';
+    if (userType === 'library') return 'Library Name';
+    return 'Student Name';
+  };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-cyan-50 via-blue-50 to-cyan-100 py-8 md:py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          
           <div className="bg-cyan-600 p-6 text-center">
             <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Submit Your Hope Request</h1>
-            <p className="text-cyan-100">Fill out the form below to get help from the community</p>
+            <p className="text-cyan-100">Let us know who needs help</p>
           </div>
           
           <div className="p-6 md:p-8 space-y-6">
+
+            <div className="grid grid-cols-3 gap-2 p-1 bg-gray-100 rounded-xl">
+              <button 
+                onClick={() => setUserType('student')}
+                className={`flex flex-col md:flex-row items-center justify-center py-3 px-2 rounded-lg text-sm font-semibold transition-all ${userType === 'student' ? 'bg-white text-cyan-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                <GraduationCap className="w-5 h-5 md:mr-2 mb-1 md:mb-0" /> Student
+              </button>
+              <button 
+                onClick={() => setUserType('school')}
+                className={`flex flex-col md:flex-row items-center justify-center py-3 px-2 rounded-lg text-sm font-semibold transition-all ${userType === 'school' ? 'bg-white text-cyan-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                <School className="w-5 h-5 md:mr-2 mb-1 md:mb-0" /> School
+              </button>
+              <button 
+                onClick={() => setUserType('library')}
+                className={`flex flex-col md:flex-row items-center justify-center py-3 px-2 rounded-lg text-sm font-semibold transition-all ${userType === 'library' ? 'bg-white text-cyan-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                <Book className="w-5 h-5 md:mr-2 mb-1 md:mb-0" /> Library
+              </button>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1">
-                 <label className="text-sm font-semibold text-gray-700">Student Name</label>
-                 <input type="text" name="studentName" value={formData.studentName} onChange={handleInputChange} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none" placeholder="e.g. Kavindi Perera" required />
+                 <label className="text-sm font-semibold text-gray-700">{getNameLabel()}</label>
+                 <input type="text" name="studentName" value={formData.studentName} onChange={handleInputChange} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none" placeholder={`Enter ${getNameLabel()}`} required />
               </div>
               <div className="space-y-1">
-                 <label className="text-sm font-semibold text-gray-700">Phone Number</label>
+                 <label className="text-sm font-semibold text-gray-700">Contact Number</label>
                  <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none" placeholder="07XXXXXXXX" required />
               </div>
               <div className="space-y-1">
@@ -70,35 +142,83 @@ const SubmitRequestPage = () => {
             </div>
 
             <div className="space-y-1">
-               <label className="text-sm font-semibold text-gray-700">Need Category</label>
-               <select name="category" value={formData.category} onChange={handleInputChange} className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 bg-white outline-none" required>
-                  <option value="">Select Category</option>
-                  {categories.map(c => <option key={c} value={c}>{c}</option>)}
-               </select>
-            </div>
-
-            <div className="space-y-1">
                <label className="text-sm font-semibold text-gray-700">Items Needed <span className="text-gray-400 font-normal">(Separate by comma)</span></label>
-               <textarea name="items" value={formData.items} onChange={handleInputChange} rows="3" className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none" placeholder="e.g. Grade 10 Science Book, Blue Pen Set" required />
+               <textarea name="items" value={formData.items} onChange={handleInputChange} rows="2" className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none" placeholder="e.g. Grade 10 Science Book, 50 Chairs, Bookshelf" required />
             </div>
 
             <div className="space-y-1">
-               <label className="text-sm font-semibold text-gray-700">Your Story <span className="text-gray-400 font-normal">(Why do you need help?)</span></label>
-               <textarea name="story" value={formData.story} onChange={handleInputChange} rows="4" className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none" placeholder="Explain your situation briefly..." required />
+               <label className="text-sm font-semibold text-gray-700">Description / Story</label>
+               <textarea name="story" value={formData.story} onChange={handleInputChange} rows="4" className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none" placeholder={userType === 'student' ? "Describe the disaster situation and how it affected your studies..." : "Describe the damage to your institution and what is urgently needed..."} required />
             </div>
 
-            <div className="border-2 border-dashed border-cyan-200 rounded-xl p-6 bg-cyan-50 text-center">
-              <label className="block text-sm font-semibold text-cyan-900 mb-3">Verification Document (School ID or Grama Sevaka Letter)</label>
-              <div className="relative">
-                 <input type="file" accept="image/*,.pdf" onChange={handleFileUpload} className="hidden" id="file-upload" required />
-                 <label htmlFor="file-upload" className="cursor-pointer inline-flex items-center px-4 py-2 bg-white border border-cyan-300 rounded-lg font-semibold text-cyan-700 hover:bg-cyan-50 transition-colors">
-                    <Upload className="w-4 h-4 mr-2" /> Upload Document
-                 </label>
-              </div>
-              {verificationPreview && (
-                <div className="mt-4 flex flex-col items-center">
-                   <p className="text-xs text-green-600 font-bold mb-2 flex items-center"><FileText className="w-3 h-3 mr-1"/> Document Selected</p>
-                   <img src={verificationPreview} alt="Preview" className="h-32 object-contain rounded-lg shadow-md border border-gray-200" />
+            <div className="grid grid-cols-1 gap-6">
+              
+              {userType === 'student' && (
+                <div className="border-2 border-dashed border-red-200 rounded-xl p-6 bg-red-50">
+                   <div className="text-center mb-4">
+                      <label className="text-sm font-bold text-red-900 mb-2 flex items-center justify-center">
+                        <AlertTriangle className="w-4 h-4 mr-2" />
+                        Proof of Disaster (Required)
+                      </label>
+                      <p className="text-xs text-red-600">Please upload photos of the damage (flooded house, damaged books, etc.)</p>
+                   </div>
+                  
+                   <div className="grid grid-cols-3 gap-4 mb-4">
+                      {formData.disasterImages.map((img, index) => (
+                        <div key={index} className="relative aspect-square rounded-lg overflow-hidden border border-red-200 group">
+                           <img src={img} alt={`Evidence ${index + 1}`} className="w-full h-full object-cover" />
+                           <button 
+                             onClick={() => removeImage(index)}
+                             className="absolute top-1 right-1 bg-white rounded-full p-1 shadow-md hover:bg-red-100 transition-colors"
+                           >
+                             <X className="w-3 h-3 text-red-600" />
+                           </button>
+                        </div>
+                      ))}
+                      
+                      <div className="relative aspect-square rounded-lg border-2 border-dashed border-red-300 bg-white hover:bg-red-50 transition-colors flex flex-col items-center justify-center cursor-pointer">
+                         <input 
+                           type="file" 
+                           accept="image/*" 
+                           multiple 
+                           onChange={handleDisasterUpload} 
+                           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+                           id="disaster-upload" 
+                         />
+                         <Plus className="w-6 h-6 text-red-400 mb-1" />
+                         <span className="text-xs font-semibold text-red-400">Add Photos</span>
+                      </div>
+                   </div>
+                   
+                   {formData.disasterImages.length === 0 && (
+                      <p className="text-center text-xs text-red-400 italic">No photos added yet</p>
+                   )}
+                </div>
+              )}
+
+              {(userType === 'school' || userType === 'library') && (
+                <div className="border-2 border-dashed border-cyan-200 rounded-xl p-6 bg-cyan-50 text-center">
+                  <label className="flex text-sm font-bold text-cyan-900 mb-2 items-center justify-center">
+                    <FileText className="w-4 h-4 mr-2" />
+                    Official Verification (Required)
+                  </label>
+                  <p className="text-xs text-cyan-600 mb-4">Upload an official request letter on letterhead or Registration Certificate</p>
+                  
+                  <div className="relative">
+                     <input type="file" accept="image/*,.pdf" onChange={handleVerificationUpload} className="hidden" id="verify-upload" required />
+                     <label htmlFor="verify-upload" className="cursor-pointer inline-flex items-center px-4 py-2 bg-white border border-cyan-300 rounded-lg font-semibold text-cyan-700 hover:bg-cyan-50 transition-colors">
+                        <Upload className="w-4 h-4 mr-2" /> Upload Document
+                     </label>
+                  </div>
+                  {verificationPreview && (
+                    <div className="mt-4 flex flex-col items-center animate-fadeIn">
+                       <p className="text-xs text-green-600 font-bold mb-2">Document Attached</p>
+                       <div className="p-3 bg-white rounded-lg border border-gray-200 shadow-sm">
+                          <FileText className="w-8 h-8 text-cyan-600" />
+                       </div>
+                       <p className="text-[10px] text-gray-500 mt-1">{formData.verificationDoc}</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

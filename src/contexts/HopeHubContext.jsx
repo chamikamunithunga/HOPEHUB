@@ -12,49 +12,58 @@ export const HopeHubProvider = ({ children }) => {
   const [requests, setRequests] = useState([
     {
       id: 1,
+      userType: 'student',
       studentName: "Kavindi Perera",
       district: "Gampaha",
       location: "Kadawatha",
-      category: "Textbooks",
-      items: ["Grade 10 Science Textbook", "Grade 10 Mathematics Textbook"],
-      story: "Our home was flooded and all my textbooks were damaged. I have my O/L exam next year.",
+      items: ["Grade 10 Science Textbook", "Shoes"],
+      story: "Our home was flooded. I lost my books.",
       phone: "0771234567",
       status: "open",
       verified: true,
-      verificationDoc: "school_letter.jpg",
+      // These arrays are REQUIRED for the modal to work
+      disasterImages: ["https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=300&q=80"], 
+      donations: [
+        { donor: "Mr. Amal", items: "Shoes", contact: "0711111111" }
+      ],
       datePosted: "2025-12-01"
     },
     {
       id: 2,
-      studentName: "Sahan Silva",
+      userType: 'school',
+      studentName: "Vidyaloka Maha Vidyalaya",
       district: "Kalutara",
       location: "Panadura",
-      category: "Uniforms",
-      items: ["School Uniform (Size 32)", "School Shoes (Size 8)"],
-      story: "Flood waters destroyed our belongings. I need a uniform to continue my studies.",
-      phone: "0767654321",
+      items: ["50 Chairs", "Whiteboard"],
+      story: "Three classrooms were damaged by the landslide.",
+      phone: "0342222222",
       status: "open",
       verified: true,
-      verificationDoc: "damage_photo.jpg",
+      verificationDoc: "letterhead.jpg",
+      disasterImages: [],
+      donations: [],
       datePosted: "2025-12-02"
     },
     {
       id: 3,
-      studentName: "Nethmi Fernando",
+      userType: 'library',
+      studentName: "Public Library Weligama",
       district: "Matara",
       location: "Weligama",
-      category: "Stationery",
-      items: ["Exercise Books (10 units)", "Pens and Pencils Set", "Geometry Box"],
-      story: "Lost all school supplies in the recent floods. Need stationery to prepare for final exams.",
-      phone: "0754567890",
-      status: "fulfilled",
+      items: ["Bookshelves", "Children's Books"],
+      story: "The ground floor was submerged. We need help restoring the children's section.",
+      phone: "0412223333",
+      status: "open",
       verified: true,
-      verificationDoc: "book_list.jpg",
+      verificationDoc: "reg_cert.jpg",
+      disasterImages: [],
+      donations: [
+         { donor: "Book Club Colombo", items: "50 Story Books", contact: "0112345678" }
+      ],
       datePosted: "2025-11-28"
     }
   ]);
 
-  // Removed currentPage state
   const [selectedDistrict, setSelectedDistrict] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -63,10 +72,20 @@ export const HopeHubProvider = ({ children }) => {
     const newRequest = {
       ...request,
       id: requests.length + 1,
+      donations: [],
       status: 'open',
       datePosted: new Date().toISOString().split('T')[0]
     };
     setRequests([...requests, newRequest]);
+  };
+
+  const addDonation = (requestId, donationData) => {
+    setRequests(requests.map(req => {
+        if (req.id === requestId) {
+            return { ...req, donations: [...req.donations, donationData] };
+        }
+        return req;
+    }));
   };
 
   const updateRequestStatus = (id, status) => {
@@ -77,12 +96,11 @@ export const HopeHubProvider = ({ children }) => {
 
   const filteredRequests = requests.filter(req => {
     const matchesDistrict = selectedDistrict === 'all' || req.district === selectedDistrict;
-    const matchesCategory = selectedCategory === 'all' || req.category === selectedCategory;
     const matchesSearch = searchQuery === '' || 
       req.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       req.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
       req.items.some(item => item.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesDistrict && matchesCategory && matchesSearch;
+    return matchesDistrict && matchesSearch;
   });
 
   return (
@@ -96,6 +114,7 @@ export const HopeHubProvider = ({ children }) => {
       searchQuery,
       setSearchQuery,
       addRequest,
+      addDonation,
       updateRequestStatus
     }}>
       {children}

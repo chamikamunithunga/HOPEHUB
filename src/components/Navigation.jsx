@@ -29,7 +29,6 @@ const Navigation = () => {
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo Section */}
           <Link to="/hub-view" className="flex items-center space-x-2" onClick={() => setIsMenuOpen(false)}>
             <div className="w-10 h-10 bg-linear-to-br from-cyan-600 to-cyan-700 rounded-lg flex items-center justify-center shadow-lg">
               <BookOpen className="w-6 h-6 text-white" />
@@ -39,14 +38,12 @@ const Navigation = () => {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-4">
             <NavLink to="/hub-view" label="Browse Requests" baseColor="bg-cyan-50" activeColor="bg-cyan-600" />
             <NavLink to="/submit" label="Submit Request" baseColor="bg-yellow-50" activeColor="bg-yellow-400 text-gray-900" />
             <NavLink to="/success" label="Success Stories" baseColor="bg-green-50" activeColor="bg-green-600" />
           </div>
 
-          {/* Mobile Menu Button */}
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -58,7 +55,6 @@ const Navigation = () => {
         </div>
       </div>
 
-      {/* Mobile Dropdown Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 shadow-lg absolute w-full left-0 px-4 pt-2 pb-4 space-y-2">
            <NavLink to="/hub-view" label="Browse Requests" baseColor="bg-cyan-50" activeColor="bg-cyan-600" />
