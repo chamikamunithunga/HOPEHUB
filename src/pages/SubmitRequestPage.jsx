@@ -115,8 +115,9 @@ const SubmitRequestPage = () => {
     return { en: 'Student Name', si: 'සිසු නාමය' };
   };
 
-  const FormLabel = ({ en, si, icon: Icon, required = false }) => (
-    <label className="form-label">
+  // Update FormLabel to accept htmlFor
+  const FormLabel = ({ en, si, icon: Icon, required = false, htmlFor }) => (
+    <label className="form-label" htmlFor={htmlFor}>
        <div className="label-content">
           {Icon && <Icon className="w-3.5 h-3.5 text-cyan-600" />}
           <span>{en}</span>
@@ -148,6 +149,7 @@ const SubmitRequestPage = () => {
               <button 
                 onClick={() => setUserType('student')}
                 className={`type-btn ${userType === 'student' ? 'active' : ''}`}
+                aria-label="Select Student"
               >
                 <GraduationCap /> 
                 <div className="flex flex-col md:flex-row md:items-baseline gap-1">
@@ -158,6 +160,7 @@ const SubmitRequestPage = () => {
               <button 
                 onClick={() => setUserType('school')}
                 className={`type-btn ${userType === 'school' ? 'active' : ''}`}
+                aria-label="Select School"
               >
                 <School /> 
                 <div className="flex flex-col md:flex-row md:items-baseline gap-1">
@@ -168,6 +171,7 @@ const SubmitRequestPage = () => {
               <button 
                 onClick={() => setUserType('library')}
                 className={`type-btn ${userType === 'library' ? 'active' : ''}`}
+                aria-label="Select Library"
               >
                 <Book /> 
                 <div className="flex flex-col md:flex-row md:items-baseline gap-1">
@@ -184,35 +188,36 @@ const SubmitRequestPage = () => {
                 
                 <div className="input-grid">
                   <div className="input-group">
-                     <FormLabel en={nameLabels.en} si={nameLabels.si} required />
-                     <input type="text" name="studentName" value={formData.studentName} onChange={handleInputChange} className="form-input" placeholder="e.g. Amantha Perera" required />
+                     <FormLabel en={nameLabels.en} si={nameLabels.si} required htmlFor="studentName" />
+                     <input id="studentName" type="text" name="studentName" value={formData.studentName} onChange={handleInputChange} className="form-input" placeholder="e.g. Amantha Perera" required />
                   </div>
                   <div className="input-group">
-                     <FormLabel en="Contact Number" si="දුරකථන අංකය" required />
-                     <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} className="form-input" placeholder="07XXXXXXXX" required />
+                     <FormLabel en="Contact Number" si="දුරකථන අංකය" required htmlFor="phone" />
+                     <input id="phone" type="tel" name="phone" value={formData.phone} onChange={handleInputChange} className="form-input" placeholder="07XXXXXXXX" required />
                   </div>
                   <div className="input-group">
-                     <FormLabel en="District" si="දිස්ත්‍රික්කය" required />
-                     <select name="district" value={formData.district} onChange={handleInputChange} className="form-select" required>
+                     <FormLabel en="District" si="දිස්ත්‍රික්කය" required htmlFor="district" />
+                     <select id="district" name="district" value={formData.district} onChange={handleInputChange} className="form-select" required>
                         <option value="">Select / තෝරන්න</option>
                         {districts.map(d => <option key={d} value={d}>{d}</option>)}
                      </select>
                   </div>
                   <div className="input-group">
-                     <FormLabel en="City / Town" si="නගරය / ප්‍රදේශය" required />
-                     <input type="text" name="location" value={formData.location} onChange={handleInputChange} className="form-input" placeholder="e.g. Kadawatha" required />
+                     <FormLabel en="City / Town" si="නගරය / ප්‍රදේශය" required htmlFor="location" />
+                     <input id="location" type="text" name="location" value={formData.location} onChange={handleInputChange} className="form-input" placeholder="e.g. Kadawatha" required />
                   </div>
                 </div>
 
                 {/* Map Section */}
                 <div className="input-group" style={{ borderTop: '1px solid var(--gray-100)', paddingTop: '1rem' }}>
-                    <FormLabel en="Location Map" si="පිහිටීම (සිතියම)" />
+                    <FormLabel en="Location Map" si="පිහිටීම (සිතියම)" htmlFor="mapLink" />
                     
                     <div className="map-box">
                         <div className="map-input-area">
                            <div className="flex items-center gap-2" style={{marginBottom: '0.5rem'}}>
                              <LinkIcon className="w-4 h-4 text-gray-400 shrink-0" />
                              <input 
+                                 id="mapLink"
                                  type="url" 
                                  name="mapLink" 
                                  value={formData.mapLink} 
@@ -222,9 +227,9 @@ const SubmitRequestPage = () => {
                                  style={{ fontSize: '0.75rem', padding: '0.5rem' }} 
                              />
                            </div>
-                           <p style={{ fontSize: '0.625rem', color: 'var(--gray-500)', paddingLeft: '1.5rem' }}>
+                           <p style={{ fontSize: '0.625rem', color: 'var(--gray-600)', paddingLeft: '1.5rem' }}>
                              Link helps donors find you.<br/>
-                             <span style={{ color: 'var(--gray-400)' }}>පරිත්‍යාගශීලීන්ට ඔබව සොයා ගැනීමට උදව් වේ.</span>
+                             <span style={{ color: 'var(--gray-500)' }}>පරිත්‍යාගශීලීන්ට ඔබව සොයා ගැනීමට උදව් වේ.</span>
                            </p>
                         </div>
                         
@@ -238,14 +243,14 @@ const SubmitRequestPage = () => {
 
                 {/* Items Needed */}
                 <div className="input-group">
-                   <FormLabel en="Items Needed" si="අවශ්‍ය ද්‍රව්‍ය" icon={Package} required />
+                   <FormLabel en="Items Needed" si="අවශ්‍ය ද්‍රව්‍ය" icon={Package} required htmlFor="items" />
                    
                    <div className="items-container">
                       <div className="tags-wrapper">
                         {formData.items.map((item, index) => (
                           <span key={index} className="item-tag">
                             {item}
-                            <button onClick={() => removeItem(item)} className="remove-tag">
+                            <button onClick={() => removeItem(item)} className="remove-tag" aria-label={`Remove ${item}`}>
                               <X className="w-3 h-3" />
                             </button>
                           </span>
@@ -253,6 +258,7 @@ const SubmitRequestPage = () => {
                       </div>
                       <div className="tag-input-wrapper">
                         <input 
+                            id="items"
                             type="text" 
                             value={currentItem} 
                             onChange={(e) => setCurrentItem(e.target.value)}
@@ -266,6 +272,7 @@ const SubmitRequestPage = () => {
                                 handleItemKeyDown(event);
                              }}
                              className="add-tag-btn"
+                             aria-label="Add item"
                         >
                            <Plus className="w-4 h-4" />
                         </button>
@@ -279,8 +286,9 @@ const SubmitRequestPage = () => {
               <div className="form-column" style={{ display: 'flex', flexDirection: 'column' }}>
                 
                 <div className="input-group" style={{ marginBottom: '1.5rem' }}>
-                   <FormLabel en="Description / Story" si="විස්තරය" required />
+                   <FormLabel en="Description / Story" si="විස්තරය" required htmlFor="story" />
                    <textarea 
+                    id="story"
                     name="story" 
                     value={formData.story} 
                     onChange={handleInputChange} 
@@ -301,21 +309,21 @@ const SubmitRequestPage = () => {
                             <span>Proof of Disaster</span>
                             <span style={{ fontWeight: '400', opacity: 0.75, fontSize: '0.75rem' }}>(ආපදා හානි ඡායාරූප)</span>
                           </label>
-                          <p style={{ fontSize: '0.625rem', color: '#dc2626' }}>Required for verification / තහවුරු කිරීම සඳහා අනිවාර්ය වේ</p>
+                          <p style={{ fontSize: '0.625rem', color: '#b91c1c' }}>Required for verification / තහවුරු කිරීම සඳහා අනිවාර්ය වේ</p>
                        </div>
                       
                        <div className="image-grid">
                           {formData.disasterImages.map((img, index) => (
                             <div key={index} className="img-preview">
                                <img src={img} alt={`Evidence ${index + 1}`} />
-                               <button onClick={() => removeImage(index)} className="remove-img">
+                               <button onClick={() => removeImage(index)} className="remove-img" aria-label={`Remove image ${index + 1}`}>
                                  <X className="w-3 h-3 text-red-600" />
                                </button>
                             </div>
                           ))}
                           
                           <div className="add-img-btn">
-                             <input type="file" accept="image/*" multiple onChange={handleDisasterUpload} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} />
+                             <input type="file" accept="image/*" multiple onChange={handleDisasterUpload} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }} aria-label="Upload disaster images" />
                              <Plus className="w-6 h-6 text-red-300" style={{ marginBottom: '0.25rem' }} />
                              <span style={{ fontSize: '0.625rem', fontWeight: '600', color: '#f87171' }}>Add</span>
                           </div>

@@ -43,9 +43,6 @@ const StatsOverview = () => {
             <h1 className="stats-title">
                මේ ඔබේ උදව් අවශ්‍යම කාලයයි
             </h1>
-            <p className="stats-subtitle">
-                This is the time you are needed most
-            </p>
         </div>
 
         <div className="grid-3">

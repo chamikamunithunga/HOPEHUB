@@ -20,6 +20,7 @@ export const FilterBar = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="search-input"
+          aria-label="Search requests"
         />
       </div>
       
@@ -29,6 +30,7 @@ export const FilterBar = () => {
               onChange={(e) => setSelectedDistrict(e.target.value)}
               className="form-select"
               style={{ cursor: 'pointer' }}
+              aria-label="Filter by District"
           >
               {districts.map(d => <option key={d} value={d}>{d === 'all' ? 'All Districts' : d}</option>)}
           </select>
@@ -68,7 +70,7 @@ export const RequestCard = ({ request, onViewClick }) => {
         </div>
 
         <div>
-            <h3 className="card-title">{request.studentName}</h3>
+            <h2 className="card-title">{request.studentName}</h2>
             <div className="card-loc">
               <MapPin className="w-3.5 h-3.5 mr-1 text-gray-400" />
               {request.location}, {request.district}
