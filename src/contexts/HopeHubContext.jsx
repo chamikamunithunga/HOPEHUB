@@ -24,7 +24,7 @@ export const HopeHubProvider = ({ children }) => {
       verified: true,
       disasterImages: ["https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=300&q=80"], 
       donations: [
-        { donor: "Mr. Amal", items: "Shoes", contact: "0711111111" }
+        { donor: "Mr. Amal", items: "Shoes", contact: "0711111111", location: "Kandy" }
       ],
       datePosted: "2025-12-01"
     },
@@ -60,7 +60,7 @@ export const HopeHubProvider = ({ children }) => {
       verificationDoc: "reg_cert.jpg",
       disasterImages: [],
       donations: [
-          { donor: "Book Club Colombo", items: "50 Story Books", contact: "0112345678" }
+          { donor: "Book Club Colombo", items: "50 Story Books", contact: "0112345678", location: "Colombo 07" }
       ],
       datePosted: "2025-11-28"
     }

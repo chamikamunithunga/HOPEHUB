@@ -4,23 +4,22 @@ import { useHopeHub } from '../contexts/HopeHubContext';
 
 const DonationModal = ({ request, onClose }) => {
   const { addDonation, requests } = useHopeHub(); 
-  const [donationForm, setDonationForm] = useState({ name: '', phone: '', items: '' });
+  const [donationForm, setDonationForm] = useState({ name: '', phone: '', location: '', items: '' });
 
   if (!request) return null;
-
 
   const activeRequest = requests.find(r => r.id === request.id) || request;
 
   const handleDonate = (e) => {
     e.preventDefault();
-    if (donationForm.name && donationForm.items) {
+    if (donationForm.name && donationForm.items && donationForm.location) {
       addDonation(activeRequest.id, {
         donor: donationForm.name,
         contact: donationForm.phone,
+        location: donationForm.location, 
         items: donationForm.items
       });
-      setDonationForm({ name: '', phone: '', items: '' });
-      // Alert removed or kept based on preference, the UI update is now visible immediately
+      setDonationForm({ name: '', phone: '', location: '', items: '' });
     }
   };
 
@@ -34,7 +33,6 @@ const DonationModal = ({ request, onClose }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
         
-        {/* Header */}
         <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-lg ${activeRequest.userType === 'student' ? 'bg-cyan-100' : activeRequest.userType === 'school' ? 'bg-purple-100' : 'bg-amber-100'}`}>
@@ -52,13 +50,10 @@ const DonationModal = ({ request, onClose }) => {
           </button>
         </div>
 
-        {/* Body Content */}
         <div className="flex flex-col lg:flex-row flex-1 overflow-auto">
             
-            {/* LEFT SIDE: Details & Donation Form */}
             <div className="flex-1 p-6 border-r border-gray-100 overflow-y-auto">
                 
-                {/* 1. NEW SECTION: Items Needed */}
                 <div className="mb-6">
                     <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
                         <Package className="w-4 h-4 mr-2" /> Needs Support For
@@ -73,7 +68,6 @@ const DonationModal = ({ request, onClose }) => {
                     </div>
                 </div>
 
-                {/* 2. Verification & Evidence */}
                 <div className="mb-6">
                     <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Verification & Evidence</h3>
                     {activeRequest.userType === 'student' ? (
@@ -99,13 +93,11 @@ const DonationModal = ({ request, onClose }) => {
                     )}
                 </div>
 
-                {/* 3. Story */}
                 <div className="mb-6">
                     <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">The Story</h3>
                     <p className="text-gray-700 bg-gray-50 p-4 rounded-xl italic border border-gray-100">"{activeRequest.story}"</p>
                 </div>
 
-                {/* 4. Donation Form */}
                 <div className="bg-cyan-50 rounded-xl p-5 border border-cyan-100">
                     <div className="flex items-center gap-2 mb-4">
                         <Gift className="w-5 h-5 text-cyan-600" />
@@ -131,6 +123,17 @@ const DonationModal = ({ request, onClose }) => {
                                 required
                             />
                         </div>
+                        <div>
+                             <input 
+                                type="text" 
+                                placeholder="Your City / Location (e.g. Colombo)" 
+                                className="w-full px-3 py-2 rounded-lg border border-cyan-200 focus:ring-2 focus:ring-cyan-500 outline-none"
+                                value={donationForm.location}
+                                onChange={e => setDonationForm({...donationForm, location: e.target.value})}
+                                required
+                            />
+                        </div>
+
                         <textarea 
                             placeholder="What would you like to donate? (e.g., 5 Books, Money)" 
                             className="w-full px-3 py-2 rounded-lg border border-cyan-200 focus:ring-2 focus:ring-cyan-500 outline-none"
@@ -153,7 +156,6 @@ const DonationModal = ({ request, onClose }) => {
                 </div>
             </div>
 
-            {/* RIGHT SIDE: Community Support */}
             <div className="w-full lg:w-80 bg-gray-50 p-6 overflow-y-auto">
                 <h3 className="text-gray-900 font-bold mb-4 flex items-center">
                     <User className="w-5 h-5 mr-2 text-green-600" /> 
@@ -168,10 +170,15 @@ const DonationModal = ({ request, onClose }) => {
                         activeRequest.donations.slice().reverse().map((donation, idx) => (
                             <div key={idx} className="bg-white p-3 rounded-lg shadow-sm border border-gray-200 animate-fadeIn">
                                 <div className="flex justify-between items-start">
-                                    <span className="font-bold text-gray-800 text-sm">{donation.donor}</span>
-                                    <span className="text-[10px] text-gray-400">Just now</span>
+                                    <div>
+                                        <div className="font-bold text-gray-800 text-sm">{donation.donor}</div>
+                                        <div className="flex items-center text-[10px] text-gray-400 mt-0.5">
+                                            <MapPin className="w-2.5 h-2.5 mr-1" /> {donation.location}
+                                        </div>
+                                    </div>
+                                    <span className="text-[10px] text-gray-300">Just now</span>
                                 </div>
-                                <div className="mt-1 text-sm text-gray-600">
+                                <div className="mt-2 text-sm text-gray-600 border-t border-gray-50 pt-2">
                                     <span className="font-semibold text-cyan-600">Pledged:</span> {donation.items}
                                 </div>
                                 <div className="mt-2 flex items-center text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded">
