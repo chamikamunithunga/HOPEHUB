@@ -1,15 +1,16 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { HopeHubProvider } from './contexts/HopeHubContext';
 import HomePage from './pages/HomePage';
 import SubmitRequestPage from './pages/SubmitRequestPage';
-import StatsOverview from './pages/StatsOverview'
+import StatsOverview from './pages/StatsOverview';
+
 
 const App = () => {
   return (
     <HopeHubProvider>
       <Router>
-        <div className="min-h-screen flex flex-col font-sans text-gray-900">
+        <div className="app-wrapper">
           <StatsOverview />
           <SubmitRequestPage />
           <HomePage />

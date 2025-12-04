@@ -9,6 +9,9 @@ export const useHopeHub = () => {
 };
 
 export const HopeHubProvider = ({ children }) => {
+  // Navigation State
+  const [currentPage, setCurrentPage] = useState('home'); // 'home' or 'submit' (simple routing logic if needed)
+
   const [requests, setRequests] = useState([
     {
       id: 1,
@@ -117,7 +120,8 @@ export const HopeHubProvider = ({ children }) => {
       setSearchQuery,
       addRequest,
       addDonation,
-      updateRequestStatus
+      updateRequestStatus,
+      setCurrentPage
     }}>
       {children}
     </HopeHubContext.Provider>
