@@ -1,29 +1,32 @@
 import React, { useState } from 'react';
-import { X, MapPin, Phone, GraduationCap, School, Book, Send, User, Gift } from 'lucide-react';
+import { X, MapPin, Phone, GraduationCap, School, Book, Send, User, Gift, Package, CheckCircle } from 'lucide-react';
 import { useHopeHub } from '../contexts/HopeHubContext';
 
 const DonationModal = ({ request, onClose }) => {
-  const { addDonation } = useHopeHub();
+  const { addDonation, requests } = useHopeHub(); 
   const [donationForm, setDonationForm] = useState({ name: '', phone: '', items: '' });
 
   if (!request) return null;
 
+
+  const activeRequest = requests.find(r => r.id === request.id) || request;
+
   const handleDonate = (e) => {
     e.preventDefault();
     if (donationForm.name && donationForm.items) {
-      addDonation(request.id, {
+      addDonation(activeRequest.id, {
         donor: donationForm.name,
         contact: donationForm.phone,
         items: donationForm.items
       });
       setDonationForm({ name: '', phone: '', items: '' });
-      alert("Thank you! Your donation pledge has been added.");
+      // Alert removed or kept based on preference, the UI update is now visible immediately
     }
   };
 
   const getTypeIcon = () => {
-    if (request.userType === 'student') return <GraduationCap className="w-6 h-6 text-cyan-600" />;
-    if (request.userType === 'school') return <School className="w-6 h-6 text-purple-600" />;
+    if (activeRequest.userType === 'student') return <GraduationCap className="w-6 h-6 text-cyan-600" />;
+    if (activeRequest.userType === 'school') return <School className="w-6 h-6 text-purple-600" />;
     return <Book className="w-6 h-6 text-amber-600" />;
   };
 
@@ -31,15 +34,16 @@ const DonationModal = ({ request, onClose }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
         
+        {/* Header */}
         <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${request.userType === 'student' ? 'bg-cyan-100' : request.userType === 'school' ? 'bg-purple-100' : 'bg-amber-100'}`}>
+            <div className={`p-2 rounded-lg ${activeRequest.userType === 'student' ? 'bg-cyan-100' : activeRequest.userType === 'school' ? 'bg-purple-100' : 'bg-amber-100'}`}>
                 {getTypeIcon()}
             </div>
             <div>
-                <h2 className="text-xl font-bold text-gray-800">{request.studentName}</h2>
+                <h2 className="text-xl font-bold text-gray-800">{activeRequest.studentName}</h2>
                 <div className="flex items-center text-sm text-gray-500">
-                    <MapPin className="w-3 h-3 mr-1" /> {request.location}, {request.district}
+                    <MapPin className="w-3 h-3 mr-1" /> {activeRequest.location}, {activeRequest.district}
                 </div>
             </div>
           </div>
@@ -48,16 +52,34 @@ const DonationModal = ({ request, onClose }) => {
           </button>
         </div>
 
+        {/* Body Content */}
         <div className="flex flex-col lg:flex-row flex-1 overflow-auto">
             
+            {/* LEFT SIDE: Details & Donation Form */}
             <div className="flex-1 p-6 border-r border-gray-100 overflow-y-auto">
                 
+                {/* 1. NEW SECTION: Items Needed */}
+                <div className="mb-6">
+                    <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center">
+                        <Package className="w-4 h-4 mr-2" /> Needs Support For
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                        {activeRequest.items.map((item, idx) => (
+                            <span key={idx} className="bg-cyan-50 text-cyan-800 text-sm px-3 py-1.5 rounded-lg font-semibold border border-cyan-100 flex items-center">
+                                <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 mr-2"></span>
+                                {item}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+
+                {/* 2. Verification & Evidence */}
                 <div className="mb-6">
                     <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3">Verification & Evidence</h3>
-                    {request.userType === 'student' ? (
+                    {activeRequest.userType === 'student' ? (
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                             {request.disasterImages && request.disasterImages.length > 0 ? (
-                                 request.disasterImages.map((img, idx) => (
+                             {activeRequest.disasterImages && activeRequest.disasterImages.length > 0 ? (
+                                 activeRequest.disasterImages.map((img, idx) => (
                                      <img key={idx} src={img} alt="Evidence" className="rounded-lg h-32 w-full object-cover border border-gray-200" />
                                  ))
                              ) : (
@@ -67,21 +89,23 @@ const DonationModal = ({ request, onClose }) => {
                     ) : (
                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center text-blue-800">
                             <div className="bg-white p-2 rounded-full mr-3 border border-blue-100">
-                                <School className="w-5 h-5 text-blue-600" />
+                                <CheckCircle className="w-5 h-5 text-blue-600" />
                             </div>
                             <div>
                                 <p className="font-semibold text-sm">Official Request Letter Verified</p>
-                                <p className="text-xs text-blue-600 opacity-80">Reference: {request.verificationDoc || 'Pending'}</p>
+                                <p className="text-xs text-blue-600 opacity-80">Reference: {activeRequest.verificationDoc || 'Pending'}</p>
                             </div>
                         </div>
                     )}
                 </div>
 
+                {/* 3. Story */}
                 <div className="mb-6">
                     <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2">The Story</h3>
-                    <p className="text-gray-700 bg-gray-50 p-4 rounded-xl italic border border-gray-100">"{request.story}"</p>
+                    <p className="text-gray-700 bg-gray-50 p-4 rounded-xl italic border border-gray-100">"{activeRequest.story}"</p>
                 </div>
 
+                {/* 4. Donation Form */}
                 <div className="bg-cyan-50 rounded-xl p-5 border border-cyan-100">
                     <div className="flex items-center gap-2 mb-4">
                         <Gift className="w-5 h-5 text-cyan-600" />
@@ -115,7 +139,7 @@ const DonationModal = ({ request, onClose }) => {
                             onChange={e => setDonationForm({...donationForm, items: e.target.value})}
                             required
                         ></textarea>
-                        <button type="submit" className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 rounded-lg transition-colors flex items-center justify-center">
+                        <button type="submit" className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 rounded-lg transition-colors flex items-center justify-center cursor-pointer shadow-sm">
                             <Send className="w-4 h-4 mr-2" /> Submit Pledge
                         </button>
                     </form>
@@ -123,25 +147,26 @@ const DonationModal = ({ request, onClose }) => {
                     <div className="mt-4 pt-4 border-t border-cyan-200 flex items-center justify-between text-sm text-cyan-800">
                         <span className="font-semibold">Recipient Contact:</span>
                         <div className="flex items-center bg-white px-3 py-1 rounded-full border border-cyan-200">
-                            <Phone className="w-3 h-3 mr-2" /> {request.phone}
+                            <Phone className="w-3 h-3 mr-2" /> {activeRequest.phone}
                         </div>
                     </div>
                 </div>
             </div>
 
+            {/* RIGHT SIDE: Community Support */}
             <div className="w-full lg:w-80 bg-gray-50 p-6 overflow-y-auto">
                 <h3 className="text-gray-900 font-bold mb-4 flex items-center">
                     <User className="w-5 h-5 mr-2 text-green-600" /> 
                     Community Support
-                    <span className="ml-auto bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full">
-                        {request.donations.length}
+                    <span className="ml-auto bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-bold">
+                        {activeRequest.donations.length}
                     </span>
                 </h3>
 
                 <div className="space-y-3">
-                    {request.donations.length > 0 ? (
-                        request.donations.map((donation, idx) => (
-                            <div key={idx} className="bg-white p-3 rounded-lg shadow-sm border border-gray-200">
+                    {activeRequest.donations.length > 0 ? (
+                        activeRequest.donations.slice().reverse().map((donation, idx) => (
+                            <div key={idx} className="bg-white p-3 rounded-lg shadow-sm border border-gray-200 animate-fadeIn">
                                 <div className="flex justify-between items-start">
                                     <span className="font-bold text-gray-800 text-sm">{donation.donor}</span>
                                     <span className="text-[10px] text-gray-400">Just now</span>

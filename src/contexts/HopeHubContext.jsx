@@ -16,12 +16,12 @@ export const HopeHubProvider = ({ children }) => {
       studentName: "Kavindi Perera",
       district: "Gampaha",
       location: "Kadawatha",
+      mapLink: "https://goo.gl/maps/dummy1",
       items: ["Grade 10 Science Textbook", "Shoes"],
       story: "Our home was flooded. I lost my books.",
       phone: "0771234567",
       status: "open",
       verified: true,
-      // These arrays are REQUIRED for the modal to work
       disasterImages: ["https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=300&q=80"], 
       donations: [
         { donor: "Mr. Amal", items: "Shoes", contact: "0711111111" }
@@ -34,6 +34,7 @@ export const HopeHubProvider = ({ children }) => {
       studentName: "Vidyaloka Maha Vidyalaya",
       district: "Kalutara",
       location: "Panadura",
+      mapLink: "",
       items: ["50 Chairs", "Whiteboard"],
       story: "Three classrooms were damaged by the landslide.",
       phone: "0342222222",
@@ -50,6 +51,7 @@ export const HopeHubProvider = ({ children }) => {
       studentName: "Public Library Weligama",
       district: "Matara",
       location: "Weligama",
+      mapLink: "https://goo.gl/maps/dummy2",
       items: ["Bookshelves", "Children's Books"],
       story: "The ground floor was submerged. We need help restoring the children's section.",
       phone: "0412223333",
@@ -58,7 +60,7 @@ export const HopeHubProvider = ({ children }) => {
       verificationDoc: "reg_cert.jpg",
       disasterImages: [],
       donations: [
-         { donor: "Book Club Colombo", items: "50 Story Books", contact: "0112345678" }
+          { donor: "Book Club Colombo", items: "50 Story Books", contact: "0112345678" }
       ],
       datePosted: "2025-11-28"
     }
@@ -80,7 +82,7 @@ export const HopeHubProvider = ({ children }) => {
   };
 
   const addDonation = (requestId, donationData) => {
-    setRequests(requests.map(req => {
+    setRequests(prevRequests => prevRequests.map(req => {
         if (req.id === requestId) {
             return { ...req, donations: [...req.donations, donationData] };
         }

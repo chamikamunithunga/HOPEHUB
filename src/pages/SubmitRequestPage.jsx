@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useHopeHub } from '../contexts/HopeHubContext';
-import { Upload, FileText, Camera, GraduationCap, School, Book, AlertTriangle, X, Plus } from 'lucide-react';
+import { Upload, FileText, GraduationCap, School, Book, AlertTriangle, X, Plus, MapPin, Link as LinkIcon } from 'lucide-react';
 
 const SubmitRequestPage = () => {
   const { addRequest } = useHopeHub();
@@ -16,6 +16,7 @@ const SubmitRequestPage = () => {
     items: '', 
     story: '', 
     phone: '', 
+    mapLink: '', // Added for Map Link
     verificationDoc: null,
     disasterImages: [] 
   });
@@ -34,7 +35,6 @@ const SubmitRequestPage = () => {
     }
   };
 
-  // Handle Disaster Images (Multiple Files)
   const handleDisasterUpload = (e) => {
     const files = Array.from(e.target.files);
     if (files.length > 0) {
@@ -46,7 +46,6 @@ const SubmitRequestPage = () => {
     }
   };
 
-  // Remove a specific image
   const removeImage = (index) => {
     setFormData(prev => ({
       ...prev,
@@ -98,6 +97,7 @@ const SubmitRequestPage = () => {
           
           <div className="p-6 md:p-8 space-y-6">
 
+            {/* User Type Selector */}
             <div className="grid grid-cols-3 gap-2 p-1 bg-gray-100 rounded-xl">
               <button 
                 onClick={() => setUserType('student')}
@@ -119,6 +119,7 @@ const SubmitRequestPage = () => {
               </button>
             </div>
 
+            {/* Basic Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1">
                  <label className="text-sm font-semibold text-gray-700">{getNameLabel()}</label>
@@ -141,6 +142,45 @@ const SubmitRequestPage = () => {
               </div>
             </div>
 
+            {/* Optional Map Section */}
+            <div className="space-y-2">
+                <label className="text-sm font-semibold text-gray-700 flex items-center justify-between">
+                    <span>Location Map <span className="text-gray-400 font-normal ml-1">(Optional)</span></span>
+                    <span className="text-xs text-cyan-600 bg-cyan-50 px-2 py-0.5 rounded-full border border-cyan-100">Paste Link & Verify</span>
+                </label>
+                
+                <div className="p-3 bg-gray-50 rounded-xl border border-gray-200">
+                    <div className="flex items-center gap-2 mb-3">
+                        <LinkIcon className="w-4 h-4 text-gray-400" />
+                        <input 
+                            type="url" 
+                            name="mapLink" 
+                            value={formData.mapLink} 
+                            onChange={handleInputChange} 
+                            className="w-full bg-white px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none text-sm" 
+                            placeholder="Paste Google Maps Link here..." 
+                        />
+                    </div>
+                    
+                    {/* Dummy Map Preview Iframe */}
+                    <div className="relative w-full h-32 md:h-40 rounded-lg overflow-hidden border border-gray-300 shadow-inner">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126743.58638668784!2d79.8211862566165!3d6.921833481635678!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae253d10f7a7003%3A0x320b2e4d32d3838d!2sColombo!5e0!3m2!1sen!2slk!4v1700000000000!5m2!1sen!2slk" 
+                            width="100%" 
+                            height="100%" 
+                            style={{border:0}} 
+                            allowFullScreen="" 
+                            loading="lazy" 
+                            title="Dummy Map Location"
+                            className="opacity-80 hover:opacity-100 transition-opacity"
+                        ></iframe>
+                        <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-[10px] font-bold text-gray-600 shadow-sm pointer-events-none flex items-center">
+                            <MapPin className="w-3 h-3 mr-1 text-red-500" /> Preview (Dummy Location)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div className="space-y-1">
                <label className="text-sm font-semibold text-gray-700">Items Needed <span className="text-gray-400 font-normal">(Separate by comma)</span></label>
                <textarea name="items" value={formData.items} onChange={handleInputChange} rows="2" className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none" placeholder="e.g. Grade 10 Science Book, 50 Chairs, Bookshelf" required />
@@ -151,6 +191,7 @@ const SubmitRequestPage = () => {
                <textarea name="story" value={formData.story} onChange={handleInputChange} rows="4" className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none" placeholder={userType === 'student' ? "Describe the disaster situation and how it affected your studies..." : "Describe the damage to your institution and what is urgently needed..."} required />
             </div>
 
+            {/* Upload Section */}
             <div className="grid grid-cols-1 gap-6">
               
               {userType === 'student' && (
