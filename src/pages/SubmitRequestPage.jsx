@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useHopeHub } from '../contexts/HopeHubContext';
-import { Upload, FileText, GraduationCap, School, Book, AlertTriangle, X, Plus, MapPin, Link as LinkIcon } from 'lucide-react';
+import { Upload, FileText, GraduationCap, School, Book, AlertTriangle, X, Plus, MapPin, Link as LinkIcon, Package } from 'lucide-react';
 
 const SubmitRequestPage = () => {
   const { addRequest } = useHopeHub();
@@ -9,14 +9,16 @@ const SubmitRequestPage = () => {
 
   const [userType, setUserType] = useState('student'); 
 
+  const [currentItem, setCurrentItem] = useState('');
+
   const [formData, setFormData] = useState({
     studentName: '', 
     district: '', 
     location: '', 
-    items: '', 
+    items: [],  
     story: '', 
     phone: '', 
-    mapLink: '', // Added for Map Link
+    mapLink: '', 
     verificationDoc: null,
     disasterImages: [] 
   });
@@ -25,6 +27,28 @@ const SubmitRequestPage = () => {
 
   const handleInputChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   
+  const handleItemKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const trimmedItem = currentItem.trim();
+      
+      if (trimmedItem && !formData.items.includes(trimmedItem)) {
+        setFormData(prev => ({
+          ...prev,
+          items: [...prev.items, trimmedItem]
+        }));
+        setCurrentItem('');  
+      }
+    }
+  };
+
+  const removeItem = (itemToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      items: prev.items.filter(item => item !== itemToRemove)
+    }));
+  };
+
   const handleVerificationUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -54,7 +78,7 @@ const SubmitRequestPage = () => {
   };
 
   const isFormValid = () => {
-    const basicFields = formData.studentName && formData.district && formData.location && formData.items && formData.story && formData.phone;
+    const basicFields = formData.studentName && formData.district && formData.location && formData.items.length > 0 && formData.story && formData.phone;
     
     if (userType === 'student') {
         return basicFields && formData.disasterImages.length > 0;
@@ -68,7 +92,8 @@ const SubmitRequestPage = () => {
       addRequest({ 
         ...formData, 
         userType, 
-        items: formData.items.split(',').map(item => item.trim()), 
+        // items is already an array now, so no need to split
+        items: formData.items, 
         verified: true,
         disasterImage: formData.disasterImages.length > 0 ? formData.disasterImages[0] : null
       });
@@ -162,7 +187,6 @@ const SubmitRequestPage = () => {
                         />
                     </div>
                     
-                    {/* Dummy Map Preview Iframe */}
                     <div className="relative w-full h-32 md:h-40 rounded-lg overflow-hidden border border-gray-300 shadow-inner">
                         <iframe 
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126743.58638668784!2d79.8211862566165!3d6.921833481635678!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ae253d10f7a7003%3A0x320b2e4d32d3838d!2sColombo!5e0!3m2!1sen!2slk!4v1700000000000!5m2!1sen!2slk" 
@@ -181,10 +205,53 @@ const SubmitRequestPage = () => {
                 </div>
             </div>
 
-            <div className="space-y-1">
-               <label className="text-sm font-semibold text-gray-700">Items Needed <span className="text-gray-400 font-normal">(Separate by comma)</span></label>
-               <textarea name="items" value={formData.items} onChange={handleInputChange} rows="2" className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 outline-none" placeholder="e.g. Grade 10 Science Book, 50 Chairs, Bookshelf" required />
+            {/* --- UPDATED: Items Needed (Point Wise) --- */}
+            <div className="space-y-2">
+               <label className="text-sm font-semibold text-gray-700 flex items-center">
+                  <Package className="w-4 h-4 mr-1.5 text-cyan-600" /> 
+                  Items Needed 
+               </label>
+               
+               <div className="bg-white border border-gray-300 rounded-lg p-2 focus-within:ring-2 focus-within:ring-cyan-500 focus-within:border-cyan-500 transition-all">
+                  
+                  {/* Visual List of Items */}
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {formData.items.map((item, index) => (
+                      <span key={index} className="bg-cyan-100 text-cyan-800 text-sm font-semibold px-3 py-1 rounded-full flex items-center animate-fadeIn">
+                        {item}
+                        <button onClick={() => removeItem(item)} className="ml-2 hover:bg-cyan-200 rounded-full p-0.5 transition-colors">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="relative">
+                    <input 
+                        type="text" 
+                        value={currentItem} 
+                        onChange={(e) => setCurrentItem(e.target.value)}
+                        onKeyDown={handleItemKeyDown}
+                        className="w-full px-2 py-1 outline-none text-sm" 
+                        placeholder={formData.items.length === 0 ? "Type an item and press Enter..." : "Add another item..."} 
+                    />
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                        <button 
+                          onClick={(e) => {
+                             // Allow manual click of plus button to add
+                             const event = { key: 'Enter', preventDefault: () => {} };
+                             handleItemKeyDown(event);
+                          }}
+                          className="bg-gray-100 hover:bg-gray-200 p-1 rounded-md text-gray-500"
+                        >
+                           <Plus className="w-4 h-4" />
+                        </button>
+                    </div>
+                  </div>
+               </div>
+               <p className="text-xs text-gray-500 text-right">Press <span className="font-bold">Enter</span> to add an item</p>
             </div>
+            {/* ------------------------------------------ */}
 
             <div className="space-y-1">
                <label className="text-sm font-semibold text-gray-700">Description / Story</label>
