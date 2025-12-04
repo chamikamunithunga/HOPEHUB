@@ -17,16 +17,15 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-cyan-50 via-blue-50 to-cyan-100 pb-12 relative">
-      <FilterBar />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+         
         <div className="mb-8 text-center">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Hope Request Board</h1>
-          <p className="text-base md:text-lg text-gray-600 bg-white/50 inline-block px-4 py-1 rounded-full border border-white">
-             <span className="font-bold text-cyan-700">{openRequests.length}</span> verified requests waiting for help
-          </p>
         </div>
         
+        <FilterBar />
+
         {openRequests.length === 0 ? (
           <div className="text-center py-16 bg-white/60 rounded-2xl border border-white shadow-sm mx-auto max-w-lg">
             <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />

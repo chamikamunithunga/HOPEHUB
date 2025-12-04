@@ -11,26 +11,27 @@ export const FilterBar = () => {
   const districts = ['all', 'Gampaha', 'Kalutara', 'Matara', 'Colombo', 'Galle'];
 
   return (
-    <div className="bg-white shadow-sm border-b border-gray-200 py-4 sticky top-16 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search by name, location, or items..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none transition-all"
-            />
-          </div>
-          <select
-            value={selectedDistrict}
-            onChange={(e) => setSelectedDistrict(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-600 bg-white outline-none cursor-pointer"
-          >
-            {districts.map(d => <option key={d} value={d}>{d === 'all' ? 'All Districts' : d}</option>)}
-          </select>
+    <div className="bg-white p-3 rounded-xl shadow-sm border border-gray-200 mb-8 sticky top-20 z-30">
+      <div className="flex flex-col md:flex-row gap-3">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <input
+            type="text"
+            placeholder="Search by name, location, or items..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-600 outline-none transition-all text-sm"
+          />
+        </div>
+        
+        <div className="w-full md:w-48">
+            <select
+                value={selectedDistrict}
+                onChange={(e) => setSelectedDistrict(e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-600 bg-white outline-none cursor-pointer text-sm"
+            >
+                {districts.map(d => <option key={d} value={d}>{d === 'all' ? 'All Districts' : d}</option>)}
+            </select>
         </div>
       </div>
     </div>
