@@ -92,7 +92,6 @@ const SubmitRequestPage = () => {
       addRequest({ 
         ...formData, 
         userType, 
-        // items is already an array now, so no need to split
         items: formData.items, 
         verified: true,
         disasterImage: formData.disasterImages.length > 0 ? formData.disasterImages[0] : null
@@ -205,7 +204,6 @@ const SubmitRequestPage = () => {
                 </div>
             </div>
 
-            {/* --- UPDATED: Items Needed (Point Wise) --- */}
             <div className="space-y-2">
                <label className="text-sm font-semibold text-gray-700 flex items-center">
                   <Package className="w-4 h-4 mr-1.5 text-cyan-600" /> 
@@ -238,7 +236,6 @@ const SubmitRequestPage = () => {
                     <div className="absolute right-2 top-1/2 -translate-y-1/2">
                         <button 
                           onClick={(e) => {
-                             // Allow manual click of plus button to add
                              const event = { key: 'Enter', preventDefault: () => {} };
                              handleItemKeyDown(event);
                           }}
@@ -251,7 +248,6 @@ const SubmitRequestPage = () => {
                </div>
                <p className="text-xs text-gray-500 text-right">Press <span className="font-bold">Enter</span> to add an item</p>
             </div>
-            {/* ------------------------------------------ */}
 
             <div className="space-y-1">
                <label className="text-sm font-semibold text-gray-700">Description / Story</label>
